@@ -84,8 +84,8 @@ db.calls.aggregate( [
 
 ```
 db.calls.aggregate( [
-    {$group: {_id: {month: {$month: "$timeStamp"}, year: {$year: "$timeStamp"}}, count: {$sum: 1}}}
-    {$sort: {count: -1}}
+    {$group: {_id: {month: {$month: "$timeStamp"}, year: {$year: "$timeStamp"}}, count: {$sum: 1}}},
+    {$sort: {count: -1}},
     {$limit: 3}
 ] )
 ```
