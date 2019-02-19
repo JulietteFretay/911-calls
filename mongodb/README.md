@@ -84,9 +84,9 @@ db.calls.aggregate( [
 
 ```
 db.calls.aggregate( [
-    {$group: {_id: {month: {$month: "$timeStamp"}, year: {$year: "$timeStamp"}}, count: {$sum: 1}}},
-	{$sort: {count: -1}},
-	{$limit: 3}
+    {$group: {_id: {month: {$month: "$timeStamp"}, year: {$year: "$timeStamp"}}, count: {$sum: 1}}}
+    {$sort: {count: -1}}
+    {$limit: 3}
 ] )
 ```
 
@@ -104,10 +104,10 @@ db.calls.aggregate( [
 
 ```
 db.calls.aggregate( [
-	{$match: {$text: {$search: "overdose"}}},
+    {$match: {$text: {$search: "overdose"}}},
     {$group: {_id: {town: "$twp"}, count: {$sum: 1}}},
-	{$sort: {count: -1}},
-	{$limit: 3}
+    {$sort: {count: -1}},
+    {$limit: 3}
 ] )
 ```
 
