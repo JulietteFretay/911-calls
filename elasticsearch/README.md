@@ -23,6 +23,269 @@ GET <nom de votre index>/_count
 
 ```
 TODO : ajouter les requêtes ElasticSearch ici
+
+Compter le nombre d'appels autour de Lansdale dans un rayon de 500 mètres :
+GET 911/_search
+{
+    "query": {
+        "bool": {
+            "must":{
+                "match_all": {}
+            },
+            "filter": {
+                "geo_distance": {
+                    "distance": 500,
+                    "coordonnees": {
+                        "lat": 40.241493,
+                        "lon": -75.283783
+                    }
+                }
+            }
+        }
+    }
+}
+Reponse:
+{
+  "took" : 191,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 717,  //----------------------------------OK
+    "max_score" : 1.0,
+    "hits" : [
+        ...
+    ]
+  }
+}
+
+Compter le nombre d'appels par catégorie :
+GET 911/_search?size=0
+{
+  "aggs": {
+    "EMS": {
+      "filter": {
+          "query_string": {
+            "default_field": "titre",
+            "query": "EMS*"
+          }
+      }
+    },
+    "Fire":{
+      "filter": {
+          "query_string": {
+            "default_field": "titre",
+            "query": "Fire*"
+          }
+      }
+    },
+    "Traffic":{
+      "filter": {
+          "query_string": {
+            "default_field": "titre",
+            "query": "Traffic*"
+          }
+        }
+    }
+  }
+}
+Réponse :
+{
+    "took" : 101,
+    "timed_out" : false,
+    "_shards" : {
+        "total" : 5,
+        "successful" : 5,
+        "skipped" : 0,
+        "failed" : 0
+    },
+    "hits" : {
+        "total" : 153194,
+        "max_score" : 0.0,
+        "hits" : [ ]
+    },
+    "aggregations" : {
+        "Traffic" : {
+            "doc_count" : 54549 //----------------------------------OK
+        },
+        "Fire" : {
+            "doc_count" : 24426 //----------------------------------KO
+        },
+        "EMS" : {
+            "doc_count" : 75591 //----------------------------------KO
+        }
+    }
+}
+Trouver les 3 mois ayant comptabilisés le plus d'appels :
+GET 911/_search?size=0
+{
+  "aggs": {
+    "callsDate": {
+      "date_histogram": {
+        "field": "dateheure",
+        "interval": "month",
+        "order": {
+          "_count": "desc"
+        }
+      }
+    }
+  }
+}
+
+Réponse :
+
+{
+  "took" : 77,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 153194,
+    "max_score" : 0.0,
+    "hits" : [ ]
+  },
+  "aggregations" : {
+    "callsDate" : {
+      "buckets" : [
+        {
+          "key_as_string" : "2016-01-01 00:00:00",
+          "key" : 1451606400000,
+          "doc_count" : 13096
+        },
+        {
+          "key_as_string" : "2016-10-01 00:00:00",
+          "key" : 1475280000000,
+          "doc_count" : 12502
+        },
+        {
+          "key_as_string" : "2016-12-01 00:00:00",
+          "key" : 1480550400000,
+          "doc_count" : 12162
+        },
+        {
+          "key_as_string" : "2016-11-01 00:00:00",
+          "key" : 1477958400000,
+          "doc_count" : 12091
+        },
+        {
+          "key_as_string" : "2016-07-01 00:00:00",
+          "key" : 1467331200000,
+          "doc_count" : 12088
+        },
+        {
+          "key_as_string" : "2016-08-01 00:00:00",
+          "key" : 1470009600000,
+          "doc_count" : 11904
+        },
+        {
+          "key_as_string" : "2016-06-01 00:00:00",
+          "key" : 1464739200000,
+          "doc_count" : 11732
+        },
+        {
+          "key_as_string" : "2016-09-01 00:00:00",
+          "key" : 1472688000000,
+          "doc_count" : 11669
+        },
+        {
+          "key_as_string" : "2016-02-01 00:00:00",
+          "key" : 1454284800000,
+          "doc_count" : 11396
+        },
+        {
+          "key_as_string" : "2016-05-01 00:00:00",
+          "key" : 1462060800000,
+          "doc_count" : 11374
+        },
+        {
+          "key_as_string" : "2016-04-01 00:00:00",
+          "key" : 1459468800000,
+          "doc_count" : 11287
+        },
+        {
+          "key_as_string" : "2016-03-01 00:00:00",
+          "key" : 1456790400000,
+          "doc_count" : 11059
+        },
+        {
+          "key_as_string" : "2015-12-01 00:00:00",
+          "key" : 1448928000000,
+          "doc_count" : 7916
+        },
+        {
+          "key_as_string" : "2017-01-01 00:00:00",
+          "key" : 1483228800000,
+          "doc_count" : 2918
+        }
+      ]
+    }
+  }
+}
+
+Trouver le top 3 des villes avec le plus d'appels pour overdose : 
+GET 911/_search?size=0
+{
+  "query": {
+    "query_string": {
+      "default_field": "titre",
+      "query": "*OVERDOSE*"
+    }
+  },
+  "aggs": {
+    "quartiers": {
+      "terms": {
+        "field": "quartier.keyword",
+        "size": 3,
+        "order" : { "_count" : "desc" }
+      }
+    }
+  }
+}
+
+Réponse : 
+{
+  "took" : 43,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 1948,
+    "max_score" : 0.0,
+    "hits" : [ ]
+  },
+  "aggregations" : {
+    "quartiers" : {
+      "doc_count_error_upper_bound" : 43,
+      "sum_other_doc_count" : 1455,
+      "buckets" : [
+        {
+          "key" : "POTTSTOWN",
+          "doc_count" : 203 //----------------------------------OK
+        },
+        {
+          "key" : "NORRISTOWN",
+          "doc_count" : 180 //----------------------------------OK
+        },
+        {
+          "key" : "UPPER MORELAND",
+          "doc_count" : 110 //----------------------------------OK
+        }
+      ]
+    }
+  }
+}
 ```
 
 ## Kibana
