@@ -25,7 +25,7 @@ GET <nom de votre index>/_count
 TODO : ajouter les requêtes ElasticSearch ici
 
 Compter le nombre d'appels autour de Lansdale dans un rayon de 500 mètres :
-GET 911/_search
+GET 911/_search?size=0
 {
     "query": {
         "bool": {
@@ -46,7 +46,7 @@ GET 911/_search
 }
 Reponse:
 {
-  "took" : 191,
+  "took" : 1,
   "timed_out" : false,
   "_shards" : {
     "total" : 5,
@@ -55,11 +55,9 @@ Reponse:
     "failed" : 0
   },
   "hits" : {
-    "total" : 717,  //----------------------------------OK
-    "max_score" : 1.0,
-    "hits" : [
-        ...
-    ]
+    "total" : 717, //----------------------------------OK
+    "max_score" : 0.0,
+    "hits" : [ ]
   }
 }
 
@@ -70,56 +68,58 @@ GET 911/_search?size=0
     "EMS": {
       "filter": {
           "query_string": {
-            "default_field": "titre",
-            "query": "EMS*"
+            "default_field": "categorie",
+            "query": "EMS"
           }
       }
     },
     "Fire":{
       "filter": {
           "query_string": {
-            "default_field": "titre",
-            "query": "Fire*"
+            "default_field": "categorie",
+            "query": "Fire"
           }
       }
     },
     "Traffic":{
       "filter": {
           "query_string": {
-            "default_field": "titre",
-            "query": "Traffic*"
+            "default_field": "categorie",
+            "query": "Traffic"
           }
         }
     }
   }
 }
+
 Réponse :
 {
-    "took" : 101,
-    "timed_out" : false,
-    "_shards" : {
-        "total" : 5,
-        "successful" : 5,
-        "skipped" : 0,
-        "failed" : 0
+  "took" : 75,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 153194,
+    "max_score" : 0.0,
+    "hits" : [ ]
+  },
+  "aggregations" : {
+    "Traffic" : {
+      "doc_count" : 54549 //----------------------------------OK
     },
-    "hits" : {
-        "total" : 153194,
-        "max_score" : 0.0,
-        "hits" : [ ]
+    "Fire" : {
+      "doc_count" : 23056 //----------------------------------OK
     },
-    "aggregations" : {
-        "Traffic" : {
-            "doc_count" : 54549 //----------------------------------OK
-        },
-        "Fire" : {
-            "doc_count" : 24426 //----------------------------------KO
-        },
-        "EMS" : {
-            "doc_count" : 75591 //----------------------------------KO
-        }
+    "EMS" : {
+      "doc_count" : 75589 //----------------------------------OK
     }
+  }
 }
+
 Trouver les 3 mois ayant comptabilisés le plus d'appels :
 GET 911/_search?size=0
 {
@@ -128,6 +128,7 @@ GET 911/_search?size=0
       "date_histogram": {
         "field": "dateheure",
         "interval": "month",
+        "format": "MM/yyyy", 
         "order": {
           "_count": "desc"
         }
@@ -139,7 +140,7 @@ GET 911/_search?size=0
 Réponse :
 
 {
-  "took" : 77,
+  "took" : 165,
   "timed_out" : false,
   "_shards" : {
     "total" : 5,
@@ -156,72 +157,72 @@ Réponse :
     "callsDate" : {
       "buckets" : [
         {
-          "key_as_string" : "2016-01-01 00:00:00",
+          "key_as_string" : "01/2016", //----------------------------------OK
           "key" : 1451606400000,
           "doc_count" : 13096
         },
         {
-          "key_as_string" : "2016-10-01 00:00:00",
+          "key_as_string" : "10/2016", //----------------------------------OK
           "key" : 1475280000000,
           "doc_count" : 12502
         },
         {
-          "key_as_string" : "2016-12-01 00:00:00",
+          "key_as_string" : "12/2016", //----------------------------------OK
           "key" : 1480550400000,
           "doc_count" : 12162
         },
         {
-          "key_as_string" : "2016-11-01 00:00:00",
+          "key_as_string" : "11/2016",
           "key" : 1477958400000,
           "doc_count" : 12091
         },
         {
-          "key_as_string" : "2016-07-01 00:00:00",
+          "key_as_string" : "07/2016",
           "key" : 1467331200000,
           "doc_count" : 12088
         },
         {
-          "key_as_string" : "2016-08-01 00:00:00",
+          "key_as_string" : "08/2016",
           "key" : 1470009600000,
           "doc_count" : 11904
         },
         {
-          "key_as_string" : "2016-06-01 00:00:00",
+          "key_as_string" : "06/2016",
           "key" : 1464739200000,
           "doc_count" : 11732
         },
         {
-          "key_as_string" : "2016-09-01 00:00:00",
+          "key_as_string" : "09/2016",
           "key" : 1472688000000,
           "doc_count" : 11669
         },
         {
-          "key_as_string" : "2016-02-01 00:00:00",
+          "key_as_string" : "02/2016",
           "key" : 1454284800000,
           "doc_count" : 11396
         },
         {
-          "key_as_string" : "2016-05-01 00:00:00",
+          "key_as_string" : "05/2016",
           "key" : 1462060800000,
           "doc_count" : 11374
         },
         {
-          "key_as_string" : "2016-04-01 00:00:00",
+          "key_as_string" : "04/2016",
           "key" : 1459468800000,
           "doc_count" : 11287
         },
         {
-          "key_as_string" : "2016-03-01 00:00:00",
+          "key_as_string" : "03/2016",
           "key" : 1456790400000,
           "doc_count" : 11059
         },
         {
-          "key_as_string" : "2015-12-01 00:00:00",
+          "key_as_string" : "12/2015",
           "key" : 1448928000000,
           "doc_count" : 7916
         },
         {
-          "key_as_string" : "2017-01-01 00:00:00",
+          "key_as_string" : "01/2017",
           "key" : 1483228800000,
           "doc_count" : 2918
         }
@@ -229,6 +230,7 @@ Réponse :
     }
   }
 }
+
 
 Trouver le top 3 des villes avec le plus d'appels pour overdose : 
 GET 911/_search?size=0

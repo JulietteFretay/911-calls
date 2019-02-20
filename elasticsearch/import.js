@@ -37,7 +37,8 @@ fs.createReadStream('../911.csv')
         titre: data.title,
         dateheure: data.timeStamp,
         quartier: data.twp,
-        adresse: data.addr
+        adresse: data.addr,
+		categorie: data.title.split(":")[0]
       })
     })
     .on('end', () => {
