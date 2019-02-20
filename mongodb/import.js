@@ -12,7 +12,19 @@ var insertCalls = function(db, callback) {
     fs.createReadStream('../911.csv')
         .pipe(csv())
         .on('data', data => {
-            var call = {}; // TODO créer l'objet call à partir de la ligne
+            var call = {
+                lat : data.lat,
+                lng : data.lng,
+                desc : data.desc,
+                zip : data.zip,
+                title : data.title,
+                timeStamp : new Date(data.timeStamp),
+                twp : data.twp,
+                addr : data.addr,
+                e : data.e,
+                loc : { type: "Point", coordinates: [parseFloat(data.lng), parseFloat(data.lat)] },
+                category : data.title.split(":")[0]
+            };
             calls.push(call);
         })
         .on('end', () => {
